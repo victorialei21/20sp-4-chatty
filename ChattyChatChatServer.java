@@ -114,8 +114,8 @@ class ChatClientHandler implements Runnable {
 					socket.close();
 				}
 				else {
-					String generalMsg = null;
-					for (int i = 2; i < inputArray.length; i++) {
+					String generalMsg = "";
+					for (int i = 0; i < inputArray.length; i++) {
 						generalMsg += inputArray[i];
 						generalMsg += " ";
 					}
@@ -148,7 +148,7 @@ class ChatClientHandler implements Runnable {
 	public void broadcastMsg(String message) {
 		
 		for(ChatClientHandler usr : ChattyChatChatServer.clientList) {
-			usr.out.println(this.name + " : " + message);
+			usr.out.println(message);
 		}//end for loop
 	}//end broadcastMsg
 
