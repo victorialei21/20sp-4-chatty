@@ -138,7 +138,7 @@ class ChatClientHandler implements Runnable {
 		for(ChatClientHandler usr : ChattyChatChatServer.clientList) {
 			
 			if(usr.name.equals(userToSendTo)) {
-				usr.out.println(this.name + ": " + message);
+				usr.out.println(message);
 			}//end if block
 		}//end for loop
 		
