@@ -9,7 +9,6 @@ public class ChattyChatChatClient {
 		int portNumber = Integer.parseInt(args[1]);
 		String hostName = args[0];
 		Socket socket = null;
-		boolean done = false;
 		
 		try {
 			socket = new Socket(hostName, portNumber);
@@ -21,13 +20,7 @@ public class ChattyChatChatClient {
 		} catch (IOException e) {
 			System.err.println("Error connecting to server :(");
 			e.printStackTrace();
-		} /*finally {
-			try {
-				socket.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}//end catch
-		}//end finally*/
+		} 
 	}//end main()
 
 }//end ChattyChatChatClient class

@@ -111,7 +111,9 @@ class ChatClientHandler implements Runnable {
 					sendDM(inputArray[1], directMsg);
 				}
 				else if(inputArray[0].equals("/quit")) {
+					out.println("You are about to disconnect from the server. Thank you!");
 					socket.close();
+					break;
 				}
 				else {
 					String generalMsg = "";
