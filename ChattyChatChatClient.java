@@ -15,16 +15,27 @@ public class ChattyChatChatClient {
 			socket = new Socket(hostName, portNumber);
 			System.out.println("Connected to host server!");
 			
+			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+		    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		   			
+			String fromServer;
+			
+			while ((fromServer = in.readLine()) != null) {
+			    System.out.println(fromServer);
+			    
+			}
+
+			
 		} catch (IOException e) {
 			System.err.println("Error connecting to server :(");
 			e.printStackTrace();
-		} finally {
+		} /*finally {
 			try {
 				socket.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}//end catch
-		}//end finally
+		}//end finally*/
 	}//end main()
 
 }//end ChattyChatChatClient class

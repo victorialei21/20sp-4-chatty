@@ -59,13 +59,7 @@ public class ChattyChatChatServer {
 		        
 			} catch(IOException e) {
 				System.err.println("Error adding client to list");
-			} /*finally {
-				try {
-					socket.close();
-				} catch(Exception e) {
-					System.err.println("Error closing socket");
-				}//end catch block
-			}//end finally*/
+			} 
 		}//end while loop
 	}//end main
 	
@@ -74,9 +68,9 @@ public class ChattyChatChatServer {
 class ChatClientHandler implements Runnable {
 
     Socket socket; 
-    PrintWriter out = null;
-    BufferedReader in = null;
     String name;
+    PrintWriter out;
+    BufferedReader in;
     
     public ChatClientHandler (Socket socket) throws IOException {
     	this.socket = socket;
@@ -86,19 +80,26 @@ class ChatClientHandler implements Runnable {
 	public void run() {
 		
 		try {
+
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			
 			out = new PrintWriter(socket.getOutputStream(), true);
-	    	in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
+
 			out.println("Welcome to ChattyChatChat!");
 			out.println("To send a general message, simply begin typing");					
 			out.println("To set your nickname, type /nick <name>");
 			out.println("To send a direct message, type /dm <name> <msg>");
 			out.println("To disconnect from the server, type /quit");
 			
-			String[] userInput = in.readLine().split(" ");
-						
-			do {
+			//String[] userInput = in.readLine().split(" ");
+			
+			String inputLine; 
+			
+			while((inputLine = in.readLine()) != null) {
+				out.println(inputLine);
+			}
+				
+			/*do {
 				
 				if(userInput[0].equals("/nick")) {
 					getNickName(userInput[1]);
@@ -111,17 +112,22 @@ class ChatClientHandler implements Runnable {
 					}
 					sendDM(userInput[1], directMsg);
 				}
-				else if(userInput[0].equals("/quit")) {
-					this.socket.close();
-					break;
-				}
 				else {
-					
+					String generalMsg = null;
+					for (int i = 2; i < userInput.length; i++) {
+						generalMsg += userInput[i];
+						generalMsg += " ";
+					}
+					broadcastMsg(generalMsg);
 				}
 				
 				userInput = in.readLine().split(" ");
 				
-			} while (userInput[0] != null);
+			} while (!userInput[0].equals("/quit"));*/
+			
+			socket.close();
+			
+			
             
 		} catch (IOException e){
 			System.err.println("Error connecting to server!");
