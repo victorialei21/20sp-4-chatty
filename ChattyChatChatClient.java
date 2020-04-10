@@ -13,23 +13,7 @@ public class ChattyChatChatClient {
 		
 		try {
 			socket = new Socket(hostName, portNumber);
-			
-			BufferedReader in = new BufferedReader( new InputStreamReader(socket.getInputStream()));
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			
-			/*(for(int i = 0; i < 4; i++) {
-				System.out.println(in.readLine());
-			}
-			
-			while(!done) {
-				String clientInput = in.readLine();
-				out.println(clientInput);
-				
-				if(clientInput.equals("/quit")) {
-					done = true;
-				}//end if statement
-				
-			}//end while loop*/
+			System.out.println("Connected to host server!");
 			
 		} catch (IOException e) {
 			System.err.println("Error connecting to server :(");
@@ -38,7 +22,7 @@ public class ChattyChatChatClient {
 			try {
 				socket.close();
 			} catch (Exception e) {
-				//something here
+				e.printStackTrace();
 			}//end catch
 		}//end finally
 	}//end main()
