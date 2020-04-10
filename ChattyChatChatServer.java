@@ -10,7 +10,6 @@ public class ChattyChatChatServer {
 
 	//vector that stores clients currently on the server
 	static Vector<ChatClientHandler> clientList = new Vector<ChatClientHandler>(); 
-	static Vector<String> users = new Vector<String>();
 	
 	//client counter
 	static int clientNumber = 0;
@@ -65,12 +64,16 @@ public class ChattyChatChatServer {
 	
 }//end ChattyChatChatServer class
 
+
+
 class ChatClientHandler implements Runnable {
 
     Socket socket; 
     String name;
     PrintWriter out;
     BufferedReader in;
+	static Vector<String> users = new Vector<String>();
+
     
     public ChatClientHandler (Socket socket) throws IOException {
     	this.socket = socket;
@@ -82,7 +85,6 @@ class ChatClientHandler implements Runnable {
 		try {
 
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
 			out = new PrintWriter(socket.getOutputStream(), true);
 
 			out.println("Welcome to ChattyChatChat!");
@@ -90,62 +92,53 @@ class ChatClientHandler implements Runnable {
 			out.println("To set your nickname, type /nick <name>");
 			out.println("To send a direct message, type /dm <name> <msg>");
 			out.println("To disconnect from the server, type /quit");
-			
-			//String[] userInput = in.readLine().split(" ");
-			
+						
 			String inputLine; 
 			
 			while((inputLine = in.readLine()) != null) {
-				out.println(inputLine);
-			}
+				String[] inputArray = inputLine.split(" ");
 				
-			/*do {
-				
-				if(userInput[0].equals("/nick")) {
-					getNickName(userInput[1]);
+				if(inputArray[0].equals("/nick")) {
+					setNickName(inputArray[1]);
+					out.println("Your nickname is: " + name);
 				}
-				else if(userInput[0].equals("/dm")) {
-					String directMsg = null;
-					for (int i = 2; i < userInput.length; i++) {
-						directMsg += userInput[i];
+				else if(inputArray[0].equals("/dm")) {
+					String directMsg = "";
+					for (int i = 2; i < inputArray.length; i++) {
+						directMsg += inputArray[i];
 						directMsg += " ";
 					}
-					sendDM(userInput[1], directMsg);
+					sendDM(inputArray[1], directMsg);
+				}
+				else if(inputArray[0].equals("/quit")) {
+					socket.close();
 				}
 				else {
 					String generalMsg = null;
-					for (int i = 2; i < userInput.length; i++) {
-						generalMsg += userInput[i];
+					for (int i = 2; i < inputArray.length; i++) {
+						generalMsg += inputArray[i];
 						generalMsg += " ";
 					}
 					broadcastMsg(generalMsg);
 				}
-				
-				userInput = in.readLine().split(" ");
-				
-			} while (!userInput[0].equals("/quit"));*/
+			}			
 			
-			socket.close();
-			
-			
-            
 		} catch (IOException e){
 			System.err.println("Error connecting to server!");
 			e.printStackTrace();
 		}//end catch statement
 	}
 	
-	public String getNickName(String name) {
-		return name;
-		//users.add(name); 
-		
-	}//end createName
+	public void setNickName(String name) {
+		this.name = name;
+		users.add(name);
+	}//end setNickName
 	
 	public void sendDM(String userToSendTo, String message) {
 		for(ChatClientHandler usr : ChattyChatChatServer.clientList) {
 			
 			if(usr.name.equals(userToSendTo)) {
-				usr.out.println(this.name + " : " + message);
+				usr.out.println(this.name + ": " + message);
 			}//end if block
 		}//end for loop
 		
