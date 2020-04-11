@@ -16,6 +16,7 @@ public class ChattyChatChatClient {
 			
 			new ReadThread(socket).start();
 			new WriteThread(socket).start();
+		
 			
 		} catch (IOException e) {
 			System.err.println("Error connecting to server :(");
@@ -53,7 +54,6 @@ class ReadThread extends Thread {
 			} catch(IOException e) {
 				System.err.println("Error reading from server: " + e.getMessage());
                 e.printStackTrace();
-                break;
 			}
 		}
 	}
@@ -90,6 +90,12 @@ class WriteThread extends Thread {
 		} catch (IOException e) {
 			System.err.println("Error writing to server");
 			e.printStackTrace();
-		}//end while loop
+		} finally {
+			try {
+				socket.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}//end run()
 }
