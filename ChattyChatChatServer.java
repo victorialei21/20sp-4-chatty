@@ -111,8 +111,11 @@ class ChatClientHandler implements Runnable {
 					sendDM(inputArray[1], directMsg);
 				}
 				else if(inputArray[0].equals("/quit")) {
-					out.println("You are about to disconnect from the server. Thank you!");
+					out.println("/quit initiated, thank you!");
 					socket.close();
+					in.close();
+					out.close();
+					System.out.println("A client has disconnected");
 					break;
 				}
 				else {
@@ -122,8 +125,8 @@ class ChatClientHandler implements Runnable {
 						generalMsg += " ";
 					}
 					broadcastMsg(generalMsg);
-				}
-			}			
+				}//end else block
+			}//end while loop	
 			
 		} catch (IOException e){
 			System.err.println("Error connecting to server!");

@@ -16,12 +16,12 @@ public class ChattyChatChatClient {
 			
 			new ReadThread(socket).start();
 			new WriteThread(socket).start();
-		
 			
 		} catch (IOException e) {
 			System.err.println("Error connecting to server :(");
 			e.printStackTrace();
 		} 
+	
 	}//end main()
 
 }//end ChattyChatChatClient class
@@ -30,6 +30,8 @@ public class ChattyChatChatClient {
 class ReadThread extends Thread {
 	BufferedReader in;
 	Socket socket;
+	boolean done = false;
+
 	
 	public ReadThread(Socket socket) {
 		this.socket = socket;
@@ -44,19 +46,35 @@ class ReadThread extends Thread {
 	
 	@Override
 	public void run() {
+			
 		while(true) {
 			try {
-				String fromServer;
 				
-				while ((fromServer = in.readLine()) != null) {
-				    System.out.println(fromServer);
-				}
+				while (!done) {
+					String fromServer = in.readLine();
+
+					if(fromServer == null || fromServer.startsWith("/quit")) {
+						done = true;
+					}
+					if(fromServer != null) {
+					    System.out.println(fromServer);
+					}
+				}//end while loop
 			} catch(IOException e) {
 				System.err.println("Error reading from server: " + e.getMessage());
                 e.printStackTrace();
+			} finally {
+				try {
+					in.close();
+					socket.close();
+				} catch (IOException e) {
+					System.err.println("Error closing input stream and socket");
+					e.printStackTrace();
+				}
 			}
 		}
-	}
+		
+	}//end run()
 	
 }//end ReadThread class
 
@@ -64,7 +82,7 @@ class WriteThread extends Thread {
 	PrintWriter out;
 	Socket socket;
     BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
-
+    boolean done = false;
 	
 	public WriteThread(Socket socket) {
 		this.socket = socket;
@@ -81,21 +99,24 @@ class WriteThread extends Thread {
 	public void run() {
 		
 		try {
-			String toSend;
 			
-			while((toSend = read.readLine())!= null) {
-				out.println(toSend);
-			}
+			while(!done) {
+				String toSend = read.readLine();
+				
+				if(toSend == null || toSend.startsWith("/quit")) {
+					done = true;
+				}
+				if(toSend != null) {
+					out.println(toSend);
+				}
+			}//end while loop
 			
 		} catch (IOException e) {
 			System.err.println("Error writing to server");
 			e.printStackTrace();
 		} finally {
-			try {
-				socket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			out.close();
 		}
+		
 	}//end run()
 }
