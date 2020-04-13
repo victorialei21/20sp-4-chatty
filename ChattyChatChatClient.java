@@ -46,10 +46,10 @@ class ReadThread extends Thread {
 	@Override
 	public void run() {
 			
-		while(true) {
+		while(!done) {
 			try {
 				
-				while (!done && !socket.isClosed() && socket.isConnected()) {
+				while (!socket.isClosed() && socket.isConnected()) {
 					String fromServer = in.readLine();
 
 					if(fromServer == null || fromServer.startsWith("/quit")) {
@@ -98,18 +98,18 @@ class WriteThread extends Thread {
 	public void run() {
 		
 		try {
-			
-			while(!done && !socket.isClosed() && socket.isConnected()) {
-				String toSend = read.readLine();
-				
-				if(toSend == null || toSend.startsWith("/quit")) {
-					done = true;
-				}
-				if(toSend != null) {
-					out.println(toSend);
-				}
+			while(!done) {
+				while(!socket.isClosed() && socket.isConnected()) {
+					String toSend = read.readLine();
+					
+					if(toSend == null || toSend.startsWith("/quit")) {
+						done = true;
+					}
+					if(toSend != null) {
+						out.println(toSend);
+					}
+				}//end while loop
 			}//end while loop
-			
 		} catch (IOException e) {
 			System.err.println("Error writing to server");
 			e.printStackTrace();
