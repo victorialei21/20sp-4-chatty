@@ -54,11 +54,13 @@ public class ChattyChatChatServer {
 		        //start this thread
 		        thrd.start();
 		        
+		        //increment client counter after starting a new handler thread
 		        clientNumber++;
 		        
 			} catch(IOException e) {
 				System.err.println("Error adding client to list");
-			} 
+				e.printStackTrace();
+			}//end catch block
 		}//end while loop
 	}//end main
 	
@@ -72,12 +74,10 @@ class ChatClientHandler implements Runnable {
     String name;
     PrintWriter out;
     BufferedReader in;
-	static Vector<String> users = new Vector<String>();
-
-    
+        
     public ChatClientHandler (Socket socket) throws IOException {
     	this.socket = socket;
-    }
+    }//end ChatClientHandler constructor
     
 	@Override
 	public void run() {
@@ -86,7 +86,8 @@ class ChatClientHandler implements Runnable {
 
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			out = new PrintWriter(socket.getOutputStream(), true);
-
+			
+			//output welcome message
 			out.println("Welcome to ChattyChatChat!");
 			out.println("To send a general message, simply begin typing");					
 			out.println("To set your nickname, type /nick <name>");
@@ -95,13 +96,17 @@ class ChatClientHandler implements Runnable {
 						
 			String inputLine; 
 			
+			//reading client's input
 			while((inputLine = in.readLine()) != null) {
+				
+				//split input into an array of strings
 				String[] inputArray = inputLine.split(" ");
 				
 				if(inputArray[0].equals("/nick")) {
 					setNickName(inputArray[1]);
 					out.println("Your nickname is: " + name);
-				}
+				}//end if block
+				
 				else if(inputArray[0].equals("/dm")) {
 					String directMsg = "";
 					for (int i = 2; i < inputArray.length; i++) {
@@ -109,34 +114,38 @@ class ChatClientHandler implements Runnable {
 						directMsg += " ";
 					}
 					sendDM(inputArray[1], directMsg);
-				}
+				}//end else if block
+				
 				else if(inputArray[0].equals("/quit")) {
 					out.println("/quit initiated, thank you!");
 					System.out.println("A client has disconnected");
 					break;
-				}
+				}//end else if block
+				
 				else {
 					String generalMsg = "";
 					for (int i = 0; i < inputArray.length; i++) {
 						generalMsg += inputArray[i];
 						generalMsg += " ";
-					}
+					}//end for loop
 					broadcastMsg(generalMsg);
 				}//end else block
+				
 			}//end while loop	
 			
 		} catch (IOException e){
 			System.err.println("Error connecting to server!");
 			e.printStackTrace();
 		}//end catch statement
-	}
+	}//end run()
 	
 	public void setNickName(String name) {
+		
 		this.name = name;
-		users.add(name);
 	}//end setNickName
 	
 	public void sendDM(String userToSendTo, String message) {
+		
 		for(ChatClientHandler usr : ChattyChatChatServer.clientList) {
 			if(usr.name != null) {
 				if(usr.name.equals(userToSendTo)) {
@@ -144,8 +153,6 @@ class ChatClientHandler implements Runnable {
 				}//end if block
 			}//end if block
 		}//end for loop
-		
-		
 	}//end sendDM
 	
 	public void broadcastMsg(String message) {
@@ -155,4 +162,4 @@ class ChatClientHandler implements Runnable {
 		}//end for loop
 	}//end broadcastMsg
 
-}
+}//end ChatClientHandler class
