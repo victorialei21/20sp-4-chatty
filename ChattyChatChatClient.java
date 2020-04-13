@@ -5,32 +5,37 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ChattyChatChatClient {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		int portNumber = Integer.parseInt(args[1]);
 		String hostName = args[0];
 		Socket socket = null;
 		
 		try {
 			socket = new Socket(hostName, portNumber);
+			
 			System.out.println("Connected to host server\n");
 			
-			new ReadThread(socket).start();
-			new WriteThread(socket).start();
+			ReadThread rThread = new ReadThread(socket);
+			WriteThread wThread = new WriteThread(socket);
+			Thread reader = new Thread(rThread);
+			Thread writer = new Thread(wThread);
+			reader.start();
+			writer.start();
 			
 		} catch (IOException e) {
 			System.err.println("Error connecting to server :(");
 			e.printStackTrace();
 		} 
+		
 	
 	}//end main()
 
 }//end ChattyChatChatClient class
 
 
-class ReadThread extends Thread {
+class ReadThread implements Runnable {
 	BufferedReader in;
 	Socket socket;
-	boolean done = false;
 	
 	public ReadThread(Socket socket) {
 		this.socket = socket;
@@ -45,15 +50,17 @@ class ReadThread extends Thread {
 	
 	@Override
 	public void run() {
-			
+		boolean done = false;
+
 		while(!done) {
 			try {
 				
-				while (!socket.isClosed() && socket.isConnected()) {
+				while (!socket.isClosed()) {
 					String fromServer = in.readLine();
 
 					if(fromServer == null || fromServer.startsWith("/quit")) {
 						done = true;
+						break;
 					}
 					if(fromServer != null) {
 					    System.out.println(fromServer);
@@ -62,16 +69,16 @@ class ReadThread extends Thread {
 			} catch(IOException e) {
 				System.err.println("Error reading from server: " + e.getMessage());
                 e.printStackTrace();
-			} finally {
-				try {
-					in.close();
-					socket.close();
-				} catch (IOException e) {
-					System.err.println("Error closing input stream and socket");
-					e.printStackTrace();
-				}
+			} 
+
+			try {
+				socket.close();
+				in.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-		}
+		}//while loop
 		
 	}//end run()
 	
@@ -81,7 +88,6 @@ class WriteThread extends Thread {
 	PrintWriter out;
 	Socket socket;
     BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
-    boolean done = false;
 	
 	public WriteThread(Socket socket) {
 		this.socket = socket;
@@ -98,24 +104,33 @@ class WriteThread extends Thread {
 	public void run() {
 		
 		try {
+		    boolean done = false;
+
 			while(!done) {
-				while(!socket.isClosed() && socket.isConnected()) {
+				while(!socket.isClosed()) {
 					String toSend = read.readLine();
 					
 					if(toSend == null || toSend.startsWith("/quit")) {
 						done = true;
 					}
-					if(toSend != null) {
+					if (toSend != null) {
 						out.println(toSend);
+					}
+					if(done == true) {
+						break;
 					}
 				}//end while loop
 			}//end while loop
 		} catch (IOException e) {
 			System.err.println("Error writing to server");
 			e.printStackTrace();
-		} finally {
-			out.close();
 		}
 		
+		/*out.close();
+		try {
+			read.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
 	}//end run()
 }

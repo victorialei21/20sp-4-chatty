@@ -112,9 +112,6 @@ class ChatClientHandler implements Runnable {
 				}
 				else if(inputArray[0].equals("/quit")) {
 					out.println("/quit initiated, thank you!");
-					socket.close();
-					in.close();
-					out.close();
 					System.out.println("A client has disconnected");
 					break;
 				}
