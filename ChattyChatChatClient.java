@@ -31,7 +31,6 @@ class ReadThread extends Thread {
 	BufferedReader in;
 	Socket socket;
 	boolean done = false;
-
 	
 	public ReadThread(Socket socket) {
 		this.socket = socket;
@@ -50,7 +49,7 @@ class ReadThread extends Thread {
 		while(true) {
 			try {
 				
-				while (!done) {
+				while (!done && !socket.isClosed() && socket.isConnected()) {
 					String fromServer = in.readLine();
 
 					if(fromServer == null || fromServer.startsWith("/quit")) {
@@ -100,7 +99,7 @@ class WriteThread extends Thread {
 		
 		try {
 			
-			while(!done) {
+			while(!done && !socket.isClosed() && socket.isConnected()) {
 				String toSend = read.readLine();
 				
 				if(toSend == null || toSend.startsWith("/quit")) {

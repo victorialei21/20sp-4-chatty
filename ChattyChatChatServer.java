@@ -141,9 +141,10 @@ class ChatClientHandler implements Runnable {
 	
 	public void sendDM(String userToSendTo, String message) {
 		for(ChatClientHandler usr : ChattyChatChatServer.clientList) {
-			
-			if(usr.name.equals(userToSendTo)) {
-				usr.out.println(message);
+			if(usr.name != null) {
+				if(usr.name.equals(userToSendTo)) {
+					usr.out.println(message);
+				}//end if block
 			}//end if block
 		}//end for loop
 		
